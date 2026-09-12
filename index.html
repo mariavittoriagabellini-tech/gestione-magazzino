@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Gestione Magazzino</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    button {
+      font-size: 22px;
+      padding: 15px 25px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    video {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 20px;
+      border: 2px solid #333;
+    }
+
+    #risultato {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>GESTIONE MAGAZZINO</h1>
+
+  <button id="avvia">SCANSIONA CODICE A BARRE</button>
+
+  <video id="video"></video>
+
+  <div id="risultato"></div>
+
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+
+  <script>
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+
+    document.getElementById('avvia').addEventListener('click', async () => {
+      const risultato = document.getElementById('risultato');
+
+      try {
+        risultato.textContent = 'Apertura fotocamera...';
+
+        await codeReader.decodeFromVideoDevice(
+          undefined,
+          'video',
+          (result, err) => {
+            if (result) {
+              risultato.textContent = 'CODICE: ' + result.text;
+              codeReader.reset();
+            }
+          }
+        );
+
+      } catch (errore) {
+        risultato.textContent = 'Errore fotocamera: ' + errore;
+      }
+    });
+  </script>
+
+</body>
+</html>
