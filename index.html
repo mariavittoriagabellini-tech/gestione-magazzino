@@ -52,6 +52,7 @@
   <script src="https://unpkg.com/@zxing/library@latest"></script>
 
   <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcYlqAf2536hMBa_GDRM9L5S7cNizt0jX0KjO1gf2TAjBdtyfdM9WJmyuuXvpX9PJl/exec';
     const codeReader = new ZXing.BrowserMultiFormatReader();
 
     document.getElementById('avvia').addEventListener('click', async () => {
@@ -64,11 +65,31 @@
           undefined,
           'video',
           (result, err) => {
-            if (result) {
-              risultato.textContent = 'CODICE: ' + result.text;
-              codeReader.reset();
-            }
-          }
+         if (result) {
+  const barcode = result.text;
+
+  risultato.textContent = 'CODICE LETTO: ' + barcode;
+
+  codeReader.reset();
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      barcode: barcode
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.ok) {
+      risultato.textContent = 'PRELIEVO REGISTRATO: ' + data.prodotto;
+    } else {
+      risultato.textContent = 'ERRORE: ' + data.messaggio;
+    }
+  })
+  .catch(error => {
+    risultato.textContent = 'ERRORE COLLEGAMENTO: ' + error;
+  });
+}
         );
 
       } catch (errore) {
